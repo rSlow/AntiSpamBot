@@ -1,10 +1,10 @@
 async def on_startup(_):
     try:
-        # Регистрация обработчиков. При объявлении через декораторы - их нужно импортировать
-        import handlers
-
         # Регистрация логгера
         import logger
+
+        # Регистрация обработчиков. При объявлении через декораторы - их нужно импортировать
+        import handlers
 
     except ImportError as ex:
         import logging
