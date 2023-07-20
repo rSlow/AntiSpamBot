@@ -32,4 +32,10 @@ forbidden_entities = [
 BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
 
 # общий список для проверяемых типов сообщения, чтобы не дублироваться
-content_types = [ContentTypes.TEXT, ContentTypes.PHOTO]
+# Звездочка перед переменной - распаковка списка "прямо здесь".
+# Почему-то, ContentTypes.TEXT равно ['text'] (именно список с одним элементом), а не строка 'text'
+content_types = [
+    *ContentTypes.TEXT,
+    *ContentTypes.PHOTO
+]
+
