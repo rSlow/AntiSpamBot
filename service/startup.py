@@ -1,6 +1,3 @@
-import logging
-
-
 async def on_startup(_):
     try:
         # Регистрация обработчиков. При объявлении через декораторы - их нужно импортировать
@@ -8,8 +5,7 @@ async def on_startup(_):
 
         # Регистрация логгера
         import logger
-        import logger1
 
     except ImportError as ex:
-        from logger import logger
-        logger.exception("ON STARTUP IMPORT ERROR", ex)
+        import logging
+        logging.exception("ON STARTUP IMPORT ERROR", exc_info=ex)
