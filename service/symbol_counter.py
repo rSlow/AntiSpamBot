@@ -1,6 +1,7 @@
 import logging
 import unicodedata
 
+from logger import logger
 from service import constants
 
 
@@ -12,19 +13,20 @@ class SymbolCounter:
         self.unknown: int = 0
         self.forbidden_emoji: int = 0
 
-        self._count(text_message)
+        self._text_message = text_message
 
-    def _count(self,
-               text_message: str):
+        self._count()
 
-        for char in text_message:
+    def _count(self):
+        for char in self._text_message:
             try:
                 unicodedata.name(char)  # проверки на возможность декодирования символа в Unicode
             except UnicodeError:
                 # Тут хорошей практикой является указывать конкретную ошибку. В данном случае при сваливании проверки
                 # выше - будет ошибка UnicodeError. Другие возникающие ошибки пропускаться не будут, и вызовут
                 # исключение.
-                pass
+                logger.warning(f"UnicodeError at decoding symbol {char}")
+                continue
 
             if char.isalpha():
                 # isalpha() проверяет, является ли символ текстовым (не цифра, знак препинания или что-то еще).
