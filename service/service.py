@@ -1,5 +1,5 @@
 import asyncio
-import logging
+from logger import logger
 import re
 import unicodedata
 
@@ -20,7 +20,7 @@ def get_message_text(message: types.Message) -> str:
 
 
 async def delete_message(message: types.Message, text):
-    logging.info(text)
+    logger.info(text)
 
     reply_message = await message.reply(text=text)
     await asyncio.sleep(10)

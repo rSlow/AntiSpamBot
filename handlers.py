@@ -1,8 +1,8 @@
 import logging
 
 from aiogram import types
+from logger import logger
 
-import logger
 from bot import dispatcher
 from service import service, constants, symbol_counter
 
@@ -12,7 +12,7 @@ async def handle_spam(message: types.Message):
     input_text = service.get_message_text(message)
     counter = symbol_counter.SymbolCounter(input_text)
 
-    logging.info(f"Символы: {counter.cyrillic, counter.latin, counter.unknown, counter.forbidden_emoji}")
+    logger.info(f"Символы: {counter.cyrillic, counter.latin, counter.unknown, counter.forbidden_emoji}")
 
     if counter.unknown >= 2 or counter.forbidden_emoji >= 3:
         # Если хотя бы два символа странных юникодов или хотя бы три запретных эмодзи, то пидор найден. Удаляем
@@ -28,7 +28,7 @@ async def handle_stop_list(message: types.Message):
         file=constants.BASE_DIR / "stop_list",
         string=input_text
     )
-    logging.info(f"стоп слов: {stop_words}")
+    logger.info(f"стоп слов: {stop_words}")
     # если стоп-слов хотя бы два и ссылка в энтитис, то это - пидор
     if has_url and stop_words >= 2:
         await service.delete_message(message, 'Похоже на политоту. Удалю через 10 секунд')
@@ -43,7 +43,7 @@ async def handle_hujnya_list(message: types.Message):
         file=constants.BASE_DIR / "hujnya_list",
         string=input_text
     )
-    logging.info(f"слов из рекламной хуйни: {hujnya_words}")
+    logger.info(f"слов из рекламной хуйни: {hujnya_words}")
     if has_url and hujnya_words >= 3:
         await service.delete_message(message, 'Похоже на хуйню кликбейтную. Удалю через 10 секунд')
 
@@ -62,3 +62,12 @@ async def handle_url_and_photo(message: types.Message):
 
     if has_url and message.photo and (message.from_user.username != 'GroupAnonymousBot'):
         await service.delete_message(message, 'Картиночка со ссылочкой? Похоже на рекламу. Удалю через 10 секунд')
+
+
+@dispatcher.errors_handler()
+async def handle_errors(update: types.Update, error: BaseException):
+    """ Обработка непредвиденных ошибок. """
+
+    message = update.message or update.callback_query.message
+    logger.exception(f"Произошла ошибка при сообщении {message}", error)
+    logging.exception(f"Произошла ошибка при сообщении {message}", exc_info=error)
